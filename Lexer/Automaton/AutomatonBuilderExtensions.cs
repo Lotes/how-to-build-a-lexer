@@ -5,11 +5,6 @@ namespace Lexer.Automaton
 {
     public static class AutomatonBuilderExtensions
     {
-        public static IAutomaton ParseRegularExpression(string input)
-        {
-            return null;
-        }
-        
         public static void AddEpsilonTransition(this IAutomatonBuilder @this, int source, int target)
         {
             @this.AddTransition(source, '\0', target);
