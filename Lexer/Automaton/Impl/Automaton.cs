@@ -12,11 +12,11 @@ namespace Lexer.Automaton.Impl
             StateCount = stateCount;
             StartState = startState;
             AcceptingStates = new HashSet<int>(acceptingStates);
-            TransitionsBySource = transitions.ToDictionary(t => t.Key, t => (ITransition) new Transition(t.Value));
+            TransitionsBySource = transitions.ToDictionary(t => t.Key, t => (IReadOnlyDictionary<char, ISet<int>>) t.Value.ToDictionary(kv => kv.Key, kv => (ISet<int>)kv.Value));
         }
         public int StartState { get; }
         public int StateCount { get; }
         public ISet<int> AcceptingStates { get; }
-        public IReadOnlyDictionary<int, ITransition> TransitionsBySource { get; }
+        public IReadOnlyDictionary<int, IReadOnlyDictionary<char, ISet<int>>> TransitionsBySource { get; }
     }
 }

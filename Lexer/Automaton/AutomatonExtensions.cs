@@ -6,6 +6,8 @@ namespace Lexer.Automaton
 {
     public static class AutomatonExtensions
     {
+        public const char Epsilon = '\0';
+        
         public static void Print(this IAutomaton @this)
         {
             Console.WriteLine($"start: {@this.StartState}");
@@ -13,7 +15,7 @@ namespace Lexer.Automaton
             foreach (var kv in @this.TransitionsBySource)
             {
                 var source = kv.Key;
-                foreach (var t in kv.Value.Targets)
+                foreach (var t in kv.Value)
                 {
                     Console.WriteLine($"{source} --{t.Key}--> {string.Join(",", t.Value)}");
                 }
@@ -30,8 +32,8 @@ namespace Lexer.Automaton
             {
                 var source = queue.Dequeue();
                 set.Add(source);
-                var targets = @this.TransitionsBySource.GetOrDefault(source)?.Targets
-                    .GetOrDefault('\0') ?? Enumerable.Empty<int>();
+                var targets = @this.TransitionsBySource.GetOrDefault(source)?
+                    .GetOrDefault(AutomatonExtensions.Epsilon) ?? Enumerable.Empty<int>();
                 foreach(var target in targets)
                     if(!set.Contains(target))
                         queue.Enqueue(target);

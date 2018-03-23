@@ -42,7 +42,7 @@ namespace Lexer.RegularExpression.Impl
             
             public char Lookahead
             {
-                get { return index >= input.Length ? '\0' : input[index]; }
+                get { return index >= input.Length ? AutomatonExtensions.Epsilon : input[index]; }
             }
             
             public IAutomaton Exec()
@@ -63,7 +63,7 @@ namespace Lexer.RegularExpression.Impl
             private IAutomaton ConcatExpression()
             {
                 var lhs = PrimaryExpression();
-                while (Lookahead != '|' && Lookahead != '\0' && Lookahead != ')')
+                while (Lookahead != '|' && Lookahead != AutomatonExtensions.Epsilon && Lookahead != ')')
                 {
                     var rhs = PrimaryExpression();
                     lhs = AutomatonConstructionKit.Concat(new[]

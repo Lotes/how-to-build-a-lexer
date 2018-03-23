@@ -9,7 +9,108 @@ namespace Lexer.Automaton
 {
     public static class AutomatonConstructionKit
     {
-        public static IAutomaton Optimize(this IAutomaton @this)
+        private static readonly Dictionary<char, ISet<int>> Empty = new Dictionary<char, ISet<int>>();
+        public static IAutomaton Minimize(this IAutomaton @this)
+        {
+            //prepare NFA automaton to a DFA automaton
+            var automaton = @this.Determinize().CleanUpUnreachables();
+            //mark all distinguishable pairs (unacceptable <-> acceptable)
+            var stateCount = automaton.StateCount;
+            var distinguishablePairs = new bool?[stateCount, stateCount];
+            foreach(var acceptable in automaton.AcceptingStates)
+            foreach (var unacceptable in Enumerable.Range(0, stateCount)
+                .Except(automaton.AcceptingStates))
+            {
+                distinguishablePairs[acceptable, unacceptable] = true;
+                distinguishablePairs[unacceptable, acceptable] = true;
+            }
+            //try to mark all others
+            // Example (#=4)
+            // 1 X
+            // 2 X X
+            // 3 X X X
+            //   0 1 2
+            var mergedByState = new Dictionary<int, HashSet<int>>();
+            var merged = new HashSet<HashSet<int>>();
+            for(var aIndex=1; aIndex<stateCount; aIndex++)
+            for(var bIndex=0; bIndex<aIndex; bIndex++)
+                if (!MarkDistinguishables(distinguishablePairs, automaton, aIndex, bIndex))
+                {
+                    var list = mergedByState.GetValueOrInsertedDefault(aIndex, mergedByState.GetValueOrInsertedLazyDefault(bIndex, () => new HashSet<int>()));
+                    list.Add(aIndex);
+                    list.Add(bIndex);
+                    merged.Add(list);
+                }
+            var mappings = new Dictionary<int, int>(); //old automaton to new automaton states
+            var inverseMappings = new Dictionary<int, int>();
+            //NOW BUILD THE FUCKING AUTOMATON!!!
+            var builder = new AutomatonBuilder();
+            foreach (var mergedStates in merged)
+            {
+                var newState = builder.AddState();
+                inverseMappings[newState] = mergedStates.First();
+                foreach (var oldState in mergedStates)
+                    mappings[oldState] = newState;
+            }
+            for (var state = 0; state < automaton.StateCount; state++)
+                if(!mappings.ContainsKey(state))
+                {
+                    var newState = builder.AddState();
+                    mappings[state] = newState;
+                    inverseMappings[newState] = state;
+                }
+            //mark starts and ends
+            builder.SetStartState(mappings[automaton.StartState]);
+            foreach(var accept in automaton.AcceptingStates)
+                builder.AcceptState(mappings[accept]);
+            //add transitions
+            foreach(var kv in inverseMappings)
+            {
+                var oldState = kv.Value;
+                var newState = kv.Key;
+                foreach (var transition in automaton.TransitionsBySource.GetOrDefault(oldState, Empty))
+                    builder.AddTransition(newState, transition.Key, mappings[transition.Value.First()]);
+            }
+            //build
+            return builder.Build();
+        }
+
+        private static bool MarkDistinguishables(bool?[,] pairs, IAutomaton automaton, int aIndex, int bIndex)
+        {
+            if (pairs[aIndex, bIndex] != null)
+                return pairs[aIndex, bIndex].Value;
+            var stateCount = automaton.StateCount;
+            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, Empty).Keys;
+            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, Empty).Keys;
+            bool result;
+            if (aInputs.Except(bInputs).Any() || bInputs.Except(aInputs).Any())
+                result = true;
+            else
+            {
+                result = false;
+                pairs[aIndex, bIndex] = result;
+                pairs[bIndex, aIndex] = result;
+                foreach (var c in aInputs)
+                {
+                    var nextAIndex = automaton.TransitionsBySource[aIndex][c].First();
+                    var nextBIndex = automaton.TransitionsBySource[bIndex][c].First(); //first, because DFA
+                    if (MarkDistinguishables(pairs, automaton, nextAIndex, nextBIndex))
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+            pairs[aIndex, bIndex] = result;
+            pairs[bIndex, aIndex] = result;
+            return result;
+        }
+
+        public static IAutomaton CleanUpUnreachables(this IAutomaton @this)
+        {
+            return @this;
+        }
+        public static IAutomaton Determinize(this IAutomaton @this)
         {
             var builder = new AutomatonBuilder();
             var newStates = new Dictionary<decimal, int>();
@@ -39,8 +140,8 @@ namespace Lexer.Automaton
                     var transition = @this.TransitionsBySource.GetOrDefault(st);
                     if (transition == null)
                         continue;
-                    foreach (var c in transition.Targets.Keys)
-                        if(c != '\0')
+                    foreach (var c in transition.Keys)
+                        if(c != AutomatonExtensions.Epsilon)
                             inputs.Add(c);
                 }
                 
@@ -53,7 +154,7 @@ namespace Lexer.Automaton
                         var transition = @this.TransitionsBySource.GetOrDefault(st);
                         if (transition == null)
                             continue;
-                        var targets = transition.Targets.GetOrDefault(c);
+                        var targets = transition.GetOrDefault(c);
                         if (targets == null)
                             continue;
                         foreach (var target in targets)

@@ -7,7 +7,7 @@ namespace Lexer.Automaton
     {
         public static void AddEpsilonTransition(this IAutomatonBuilder @this, int source, int target)
         {
-            @this.AddTransition(source, '\0', target);
+            @this.AddTransition(source, AutomatonExtensions.Epsilon, target);
         }
 
         public static void CopyTo(this IAutomaton @this, IAutomatonBuilder builder, out int oldNewStartState,
@@ -20,7 +20,7 @@ namespace Lexer.Automaton
             {
                 var source = stateMapping[kv.Key];
                 var transition = kv.Value;
-                foreach (var target in transition.Targets)
+                foreach (var target in transition)
                 {
                     foreach(var x in target.Value.Select(v => stateMapping[v]))
                         builder.AddTransition(source, target.Key, x);
