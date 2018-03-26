@@ -18,9 +18,10 @@ namespace Main
                     return;
                 try
                 {
-                    var automaton = parser.Parse(input).Minimize();
-                    Console.WriteLine(automaton.StateCount+" states");
-                    automaton.Print();
+                    var automaton = parser.Parse(input);
+                    var minimized = automaton.Minimize();
+                    Console.WriteLine(minimized.StateCount+" states");
+                    minimized.Print();
                 }
                 catch (Exception e)
                 {

@@ -13,7 +13,7 @@ namespace Lexer.Automaton
         public static IAutomaton Minimize(this IAutomaton @this)
         {
             //prepare NFA automaton to a DFA automaton
-            var automaton = @this.Determinize().CleanUpUnreachables();
+            var automaton = @this.Determinize();
             //mark all distinguishable pairs (unacceptable <-> acceptable)
             var stateCount = automaton.StateCount;
             var distinguishablePairs = new bool?[stateCount, stateCount];
@@ -79,17 +79,17 @@ namespace Lexer.Automaton
         {
             if (pairs[aIndex, bIndex] != null)
                 return pairs[aIndex, bIndex].Value;
-            var stateCount = automaton.StateCount;
-            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, Empty).Keys;
-            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, Empty).Keys;
+            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, Empty).Keys.ToArray();
+            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, Empty).Keys.ToArray();
             bool result;
             if (aInputs.Except(bInputs).Any() || bInputs.Except(aInputs).Any())
                 result = true;
             else
             {
                 result = false;
-                pairs[aIndex, bIndex] = result;
-                pairs[bIndex, aIndex] = result;
+                //set her to avoid stack overflow when entering a cycle!
+                pairs[aIndex, bIndex] = false;
+                pairs[bIndex, aIndex] = false;
                 foreach (var c in aInputs)
                 {
                     var nextAIndex = automaton.TransitionsBySource[aIndex][c].First();
@@ -105,11 +105,7 @@ namespace Lexer.Automaton
             pairs[bIndex, aIndex] = result;
             return result;
         }
-
-        public static IAutomaton CleanUpUnreachables(this IAutomaton @this)
-        {
-            return @this;
-        }
+        
         public static IAutomaton Determinize(this IAutomaton @this)
         {
             var builder = new AutomatonBuilder();
@@ -152,9 +148,7 @@ namespace Lexer.Automaton
                     foreach (var st in source)
                     {
                         var transition = @this.TransitionsBySource.GetOrDefault(st);
-                        if (transition == null)
-                            continue;
-                        var targets = transition.GetOrDefault(c);
+                        var targets = transition?.GetOrDefault(c);
                         if (targets == null)
                             continue;
                         foreach (var target in targets)
