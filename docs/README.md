@@ -11,13 +11,13 @@ Before I can parse a text, it first has do be translated into tokens. Tokens gro
 They are classes of character sequences. Each class can be described using the following operators:
 
 * Concatenation: `ab` (searching an `a` followed by a `b`)
-*	Repetition: `a*` = `a` or `aa` or `aaa`… (finite sequence)
-*	Alternation: `aa|bb` = `aa` or `bb`
+* Repetition: `a*` = `a` or `aa` or `aaa`… (finite sequence)
+* Alternation: `aa|bb` = `aa` or `bb`
 
 Combinations of these operators are also possible, like `(0|1)+.(0|1)+` for binary decimal strings, like `0.0`, `1010.110`... 
 
 ## And what is a NFA?
-Basically it is a certain class of state machine. A deterministic finite automaton (DFA) starts at one state. Each state has n outgoing edges, where n is the number of distinct input symbols. Some states are marked as accepting states. If the state machine holds at an accepting state, a token could be emitted. Non-determinism just says that the edges could occur multiple times for one state or that no symbol must be read to change the state.
+Basically it is a certain class of state machine. A deterministic finite automaton (DFA) starts at one state. Each state has `n` outgoing edges, where `n` is the number of distinct input symbols. Some states are marked as accepting states. If the state machine holds at an accepting state, a token could be emitted. Non-determinism just says that the edges could occur multiple times for one state or that no symbol must be read to change the state (&epsilon; transitions).
 
 ### Example
 <diagram>
