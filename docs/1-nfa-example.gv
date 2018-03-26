@@ -1,0 +1,16 @@
+digraph G {
+  node [
+      shape=circle
+  ]
+  start [shape=none]
+  deny
+  accept [shape=doublecircle]
+  intermediate [label=""]
+  start -> intermediate [label=""]
+  intermediate -> accept [label="&epsilon;"]
+  intermediate -> deny [label="&epsilon;"]
+  deny -> deny [label="0"]
+  deny -> accept [label="1"]
+  accept -> accept [label="1"]
+  accept -> deny [label="0"]
+}
