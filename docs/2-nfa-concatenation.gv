@@ -4,6 +4,18 @@ digraph G {
   start [shape=none]
   0
   1 [shape=doublecircle]
+  subgraph cluster0 {
+      label="nfa1"
+      rankdir=LR;
+      a -> b [style=invis]
+  }
+  subgraph cluster1 {
+      label="nfa2"
+      rankdir=LR;
+      c -> d [style=invis]
+  }
   start -> 0 [label=""]
-  0 -> 1 [label="&alpha;"]
+  0 -> a
+  b -> c
+  d -> 1 [label="&epsilon;"]
 }
