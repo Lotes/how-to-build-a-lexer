@@ -1,0 +1,17 @@
+digraph G {
+  rankdir=LR;
+  node [shape=circle]
+  start [shape=none]
+  0
+  1 [shape=doublecircle]
+  subgraph cluster0 {
+      label="nfa"
+      rankdir=LR;
+      a -> b [style=invis]
+  }
+  start -> 0 [label=""]
+  0 -> a [label="&epsilon;"]
+  0 -> 1 [label="&epsilon;"]
+  b -> 1 [label="&epsilon;"]
+  1 -> 0 [label="&epsilon;"]
+}
