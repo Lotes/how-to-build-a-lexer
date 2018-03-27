@@ -14,7 +14,7 @@ digraph G {
       rankdir=LR;
       c -> d [style=invis]
   }
-  start -> 0 [label=""]
+  start -> 0
   0 -> a [label="&epsilon;"]
   b -> c [label="&epsilon;"]
   d -> 1 [label="&epsilon;"]

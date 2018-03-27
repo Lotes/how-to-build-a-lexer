@@ -1,0 +1,9 @@
+digraph G {
+  rankdir=LR;
+  node [shape=circle]
+  start [shape=none]
+  0
+  1 [shape=doublecircle]
+  start -> 0
+  0 -> 1 [label="&alpha;"]
+}

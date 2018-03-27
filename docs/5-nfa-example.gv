@@ -1,41 +1,41 @@
 digraph G {
-  rankdir=LR;
+  title="(aa|b)*"
+  rankdir=LR
   node [shape=circle]
   start [shape=none]
   0
   1 [shape=doublecircle]
-  
   subgraph cluster4 {
-      label="aa|b"
-  subgraph cluster2 {
-       label="aa"
-  subgraph cluster0 {
-      label="a"
-      rankdir=LR;
-      2 -> 3 [label="a"]
+    label="aa|b"
+    subgraph cluster2 {
+      label="aa"
+      subgraph cluster0 {
+        label="a"
+        rankdir=LR;
+        2 -> 3 [label="a"]
+      }
+      subgraph cluster1 {
+        label="a"
+        rankdir=LR
+        4 -> 5 [label="a"]
+      }
+      3 -> 6 [label="&epsilon;"]
+      6 -> 4 [label="&epsilon;"]
+      7 -> 2 [label="&epsilon;"]
+      5 -> 8 [label="&epsilon;"]
+    }
+    subgraph cluster3 {
+      label="b"
+      9 -> 10 [label="b"]
+    }
+    11 ->  7 [label="&epsilon;"]
+    11 ->  9 [label="&epsilon;"]
+    10 -> 12 [label="&epsilon;"]
+     8 -> 12 [label="&epsilon;"]
   }
-  subgraph cluster1 {
-      label="a"
-      rankdir=LR
-      4 -> 5 [label="a"]
-  }
-  3 -> 6 [label="&epsilon;"]
-  6 -> 4 [label="&epsilon;"]
-  7 -> 2 [label="&epsilon;"]
-  5 -> 8 [label="&epsilon;"]
-  }
-  subgraph cluster3 {
-    label="b"
-    9 -> 10 [label="b"]
-  }
-  11 -> 7
-  11 -> 9
-  10 -> 12
-  8 -> 12
-  }
-  start -> 0 [label=""]
+  start -> 0
   0 -> 11 [label="&epsilon;"]
-  0 -> 1 [label="&epsilon;"]
-  1 -> 0 [label="&epsilon;"]
+  0 ->  1 [label="&epsilon;"]
+  1 ->  0 [label="&epsilon;"]
   12 -> 1 [label="&epsilon;"]
 }
