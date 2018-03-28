@@ -57,25 +57,44 @@ The advantage of an DFA is that we can run simulations faster. The disadvantage 
 ### Big example continued...
 By applying this natural language algorithm, we get the following automaton.
 
-![Example](7-dfa-example.gv.png)
+![Example deteminized](7-dfa-example-determinized.gv.png)
 
+|DFA state| NFA states|
+|---------|-----------|
+|0        |{0, 1, 2, 7, 9, 11} |
+|1        |{0, 1, 2, 7, 9, 10, 11, 12} |
+|2        |{3, 4, 6} |
+|3        |{0, 1, 2, 5, 7, 8, 9, 11, 12} |
 
 ## But is this automaton minimal?
 Can we not reduce some states here!? The answer is yes.
-The algorithm is quiet simple... but very costly (O(n^2), where n is the number of states). We are searching all equivalence classes of the given states. Two states are equal, if both are accepting or both are denying and all their transition’s target states for the same input are pairwise equal (recursion). You can start the recursion by distinguishing all denying from accepting states.
-Example:
-<diagram/>
+The algorithm is quiet simple... but expensive (O(n^2), where n is the number of states). We are searching all equivalence classes of the given states. Two states are equal, if both are accepting or both are denying *and* all their transition’s target states for the same input are pairwise equal (recursion). You can start the recursion by distinguishing all denying from accepting states.
+
+### Example
+| |0|1|2|
+|-|-|-|-|
+|3|y1|y1|n|
+|2|n|n|-|
+|1|y1|-|-|
+
+We have found one equivalence class `y1`. So, at the end we can merge the three states `0`, `1`, `3` to a new DFA state `0` and `2` becomes `1`. This is the resulting DFA (quiet small, huh?):
+
+![Example minimized](8-dfa-example-minimized.gv.png)
+
 Great the automata resulting from a regular expression are complete and minimal. Now let’s construct the lexer!
 
 ## Finally: The lexer!
-The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach would be a for loop over the set of regular expressions until one does match. But this is boring. I will combine all regular expressions with the alternate operator ‘|’. All I need is a feedback which regular expression has matched (when multiple expressions matches, tell me all of them).
-<code/>
+
+The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach would be a for loop over the set of regular expressions until one does match. But this is boring. I will combine all regular expressions with the alternate operator `|`. All I need is a feedback which regular expression has matched (when multiple expressions matches, tell me all of them).
+
+```
+xyz
+```
 
 ## Further readings
-•	PlantUML
-•	Aho – Compiler Constructions
-•	Github repository
+*	[Alfred Aho et. al. – Compilers](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
+*	[Github repository](https://github.com/Lotes/how-to-build-a-lexer)
+* [GraphViz](https://www.graphviz.org/) used for generating diagrams
 
 ## TODO
-•	Diagrammskripte aus Automaten erzeugen
-•	Diagramme aus Skripten erzeugen
+* show some interfaces... (code)
