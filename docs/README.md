@@ -25,6 +25,19 @@ Basically it is a certain class of state machine. A deterministic finite automat
 
 Circles represent state. Double cycles are accepting states. Transitions are labelled with input symbols. The input symbol `&epsilon;` is the `EMPTY` input (no character).
 
+### The `IAutomaton` Interface
+
+```csharp
+public interface IAutomaton
+{
+  int StartState { get; }
+  int StateCount { get; }
+  ISet<int> AcceptingStates { get; }
+  //source -> input symbol -> targets
+  IReadOnlyDictionary<int, IReadOnlyDictionary<char, ISet<int>>> TransitionsBySource { get; }
+}
+```
+
 ## Solution
 To convert a regular expression into a NFA, you just have to find an automaton representation for each construction rule (concatenation, repetition and alternation). Let’s do this!
 
@@ -71,13 +84,13 @@ Can we not reduce some states here!? The answer is yes.
 The algorithm is quiet simple... but expensive (O(n^2), where n is the number of states). We are searching all equivalence classes of the given states. Two states are equal, if both are accepting or both are denying *and* all their transition’s target states for the same input are pairwise equal (recursion). You can start the recursion by distinguishing all denying from accepting states.
 
 ### Example
-| |0|1|2|
-|-|-|-|-|
-|3|y1|y1|n|
-|2|n|n|-|
-|1|y1|-|-|
+|Equal?|0 |1 |2 |
+|------|--|--|--|
+|**3** |e1|e1|no|
+|**2** |no|no|- |
+|**1** |e1|- |- |
 
-We have found one equivalence class `y1`. So, at the end we can merge the three states `0`, `1`, `3` to a new DFA state `0` and `2` becomes `1`. This is the resulting DFA (quiet small, huh?):
+We have found one equivalence class `e1`. So, at the end we can merge the three states `0`, `1`, `3` to a new DFA state `0` and `2` becomes `1`. This is the resulting DFA (quite small, huh?):
 
 ![Example minimized](8-dfa-example-minimized.gv.png)
 
@@ -85,7 +98,7 @@ Great the automata resulting from a regular expression are complete and minimal.
 
 ## Finally: The lexer!
 
-The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach would be a for loop over the set of regular expressions until one does match. But this is boring. I will combine all regular expressions with the alternate operator `|`. All I need is a feedback which regular expression has matched (when multiple expressions matches, tell me all of them).
+The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach would be a for loop over the set of regular expressions until one does match. But this is boring. I will combine all regular expressions with the alternate operator `|`. All I need is a feedback which regular expression has matched and how far (when multiple expressions matches, tell me all of them).
 
 ```
 xyz

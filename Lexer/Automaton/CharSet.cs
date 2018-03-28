@@ -10,10 +10,12 @@ namespace Lexer.Automaton
     {
         private readonly List<CharRange> list = new List<CharRange>();
 
+        public int Length { get { return list.Sum(r => r.Count()); } }
+
         public bool Contains(char c)
         {
             var index = 0;
-            while (index < list.Count && list[index].From < c)
+            while (index < list.Count && c > list[index].To)
                 index++;
             if (index >= list.Count)
                 return false;
@@ -24,7 +26,7 @@ namespace Lexer.Automaton
         public bool Contains(char from, char to)
         {
             var index = 0;
-            while (index < list.Count && list[index].From < from)
+            while (index < list.Count && from > list[index].To)
                 index++;
             if (index >= list.Count)
                 return false;
@@ -35,7 +37,7 @@ namespace Lexer.Automaton
         public void Add(char c)
         {
             var index = 0;
-            while (index < list.Count && list[index].From < c)
+            while (index < list.Count && c > list[index].To)
                 index++;
             if (index >= list.Count)
             {
@@ -47,16 +49,23 @@ namespace Lexer.Automaton
                 var range = list[index];
                 if(c >= range.From && c <= range.To)
                     return; //already included
-                //c must be greater than range.To
-                list.Insert(index+1, new CharRange(c));
-                TryMergeRange(index+1);
+                if (c > range.To)
+                {
+                    list.Insert(index + 1, new CharRange(c));
+                    TryMergeRange(index + 1);
+                }    
+                else // c < range.From
+                {
+                    list.Insert(index, new CharRange(c));
+                    TryMergeRange(index);
+                }
             }
         }
 
         public void Add(char from, char to)
         {
             var index = 0;
-            while (index < list.Count && list[index].From < from)
+            while (index < list.Count && from > list[index].To)
                 index++;
             if (index >= list.Count)
             {
@@ -66,14 +75,71 @@ namespace Lexer.Automaton
             else
             {
                 var fromIndex = index;
-                while (index < list.Count && list[index].To < to)
+                while (index < list.Count && from > list[index].To)
                     index++;
-                list.RemoveRange(fromIndex, index-fromIndex+1);
+                if(index < list.Count)
+                {
+                    if (from > list[index].From)
+                    {
+                        from = list[index].From;
+                        list.RemoveRange(fromIndex, index - fromIndex + 1);
+                    }
+                }
                 list.Insert(fromIndex, new CharRange(from, to));
                 TryMergeRange(fromIndex);
             }
         }
-        
+
+        public void Remove(char c)
+        {
+            var index = 0;
+            while (index < list.Count && c > list[index].To)
+                index++;
+            if (index >= list.Count)
+                return;
+            var range = list[index];
+            if (c < range.From || c > range.To)
+                return;
+            list.RemoveAt(index);
+            if (range.From == range.To)
+                ;
+            else if (range.From == c)
+                    list.Insert(index, new CharRange((char)(c+1), range.To));
+            else if (range.To == c)
+                list.Insert(index, new CharRange(range.From, (char)(c - 1)));
+            else
+            {
+                list.Insert(index, new CharRange(range.From, (char)(c - 1)));
+                list.Insert(index+1, new CharRange((char)(c + 1), range.To));
+            }
+        }
+
+        public void Remove(char from, char to)
+        {
+            var index = 0;
+            while (index < list.Count && from > list[index].To)
+                index++;
+            if (index >= list.Count)
+                return;
+            var range = list[index];
+            if (from > range.To)
+                return; //nothing to do
+            list.RemoveAt(index);
+            if (range.From <= from - 1)
+            {
+                list.Insert(index, new CharRange(range.From, (char)(from - 1)));
+                index++;
+                while (index < list.Count && to < list[index].From)
+                    list.RemoveAt(index);
+                if (index < list.Count)
+                {
+                    range = list[index];
+                    list.RemoveAt(index);
+                    list.Insert(index, new CharRange((char)(to + 1), range.To));
+                }
+            }
+        }
+
         private void TryMergeRange(int index)
         {
             var current = list[index];
@@ -98,7 +164,7 @@ namespace Lexer.Automaton
                 }
             }
         }
-        
+
         public IEnumerator<CharRange> GetEnumerator()
         {
             return list.GetEnumerator();

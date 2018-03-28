@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexer", "Lexer\Lexer.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main", "Main\Main.csproj", "{FFBF79FD-6B1E-4E02-B086-8BCD2ABAC14B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{61123303-1217-4491-B7E0-ED2CF0C918CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{FFBF79FD-6B1E-4E02-B086-8BCD2ABAC14B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFBF79FD-6B1E-4E02-B086-8BCD2ABAC14B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFBF79FD-6B1E-4E02-B086-8BCD2ABAC14B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61123303-1217-4491-B7E0-ED2CF0C918CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61123303-1217-4491-B7E0-ED2CF0C918CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61123303-1217-4491-B7E0-ED2CF0C918CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61123303-1217-4491-B7E0-ED2CF0C918CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

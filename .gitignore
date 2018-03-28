@@ -3,3 +3,7 @@
 /Lexer/obj
 /Main/bin
 /Main/obj
+/TestResults
+/Tests/obj
+/Tests/bin
+/.vs
