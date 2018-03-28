@@ -84,6 +84,7 @@ Can we not reduce some states here!? The answer is yes.
 The algorithm is quiet simple... but expensive (O(n^2), where n is the number of states). We are searching all equivalence classes of the given states. Two states are equal, if both are accepting or both are denying *and* all their transition’s target states for the same input are pairwise equal (recursion). You can start the recursion by distinguishing all denying from accepting states.
 
 ### Example
+
 |Equal?|0 |1 |2 |
 |------|--|--|--|
 |**3** |e1|e1|no|
