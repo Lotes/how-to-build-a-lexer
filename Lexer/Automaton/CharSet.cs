@@ -125,6 +125,9 @@ namespace Lexer.Automaton
             if (from > range.To)
                 return; //nothing to do
             list.RemoveAt(index);
+            //  a-c e-g
+            //       ^
+            //remove f-i
             if (range.From <= from - 1)
             {
                 list.Insert(index, new CharRange(range.From, (char)(from - 1)));
@@ -137,6 +140,14 @@ namespace Lexer.Automaton
                     list.RemoveAt(index);
                     list.Insert(index, new CharRange((char)(to + 1), range.To));
                 }
+            }
+            //        b-d   
+            //       ^
+            //remove a-c
+            else //range.From > from-1
+            {
+                if(to+1 <= range.To)
+                    list.Insert(index, new CharRange((char)(to+1), range.To));
             }
         }
 
