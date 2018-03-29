@@ -107,6 +107,9 @@ xyz
 
 ## Further readings
 *	[Alfred Aho et. al. – Compilers](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
+* [NFA construction](https://en.m.wikipedia.org/wiki/Thompson's_construction)
+* [NFA to DFA conversion](https://en.m.wikipedia.org/wiki/Powerset_construction)
+* [DFA minimization](https://en.m.wikipedia.org/wiki/DFA_minimization)
 *	[Github repository](https://github.com/Lotes/how-to-build-a-lexer)
 * [GraphViz](https://www.graphviz.org/) used for generating diagrams
 
