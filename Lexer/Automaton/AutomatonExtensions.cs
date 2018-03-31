@@ -6,8 +6,25 @@ namespace Lexer.Automaton
 {
     public static class AutomatonExtensions
     {
-        public const char Epsilon = '\0';
-        
+        private static IReadOnlyDictionary<char, ISet<int>> Empty = new Dictionary<char, ISet<int>>();
+        private static ISet<int> EmptyStates = new HashSet<int>();
+        public static bool Read(this IAutomaton @this, string input)
+        {
+            @this.Print();
+            var state = new HashSet<int>(@this.GetEpsilonClosure(@this.StartState));
+            foreach(var c in input)
+            {
+                state = new HashSet<int>(
+                    @this.GetEpsilonClosure(
+                        state.SelectMany(s => @this.TransitionsBySource.GetOrDefault(s, Empty)
+                            .GetOrDefault(c, EmptyStates))
+                            .ToArray()));
+                if (!state.Any())
+                    return false;
+            }
+            return @this.AcceptingStates.Intersect(state).Any();
+        }
+
         public static void Print(this IAutomaton @this)
         {
             Console.WriteLine($"start: {@this.StartState}");
@@ -33,7 +50,7 @@ namespace Lexer.Automaton
                 var source = queue.Dequeue();
                 set.Add(source);
                 var targets = @this.TransitionsBySource.GetOrDefault(source)?
-                    .GetOrDefault(AutomatonExtensions.Epsilon) ?? Enumerable.Empty<int>();
+                    .GetOrDefault(CharSet.Epsilon) ?? Enumerable.Empty<int>();
                 foreach(var target in targets)
                     if(!set.Contains(target))
                         queue.Enqueue(target);

@@ -47,5 +47,10 @@ namespace Lexer.Automaton
         {
             return (byte)From | ((byte)To << 8);
         }
+
+        public override string ToString()
+        {
+            return From == To ? From.ToString() : From+"-"+To;
+        }
     }
 }

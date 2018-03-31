@@ -7,7 +7,7 @@ using Lexer.Automaton.Impl;
 
 namespace Lexer.Automaton
 {
-    public static class AutomatonConstructionKit
+    public static class ConstructionKit
     {
         private static readonly Dictionary<char, ISet<int>> Empty = new Dictionary<char, ISet<int>>();
         public static IAutomaton Minimize(this IAutomaton @this)
@@ -137,7 +137,7 @@ namespace Lexer.Automaton
                     if (transition == null)
                         continue;
                     foreach (var c in transition.Keys)
-                        if(c != AutomatonExtensions.Epsilon)
+                        if(c != CharSet.Epsilon)
                             inputs.Add(c);
                 }
                 

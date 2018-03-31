@@ -5,9 +5,14 @@ namespace Lexer.Automaton
 {
     public static class AutomatonBuilderExtensions
     {
+        public static void AddTransition(this IAutomatonBuilder @this, int source, char c, int target)
+        {
+            @this.AddTransition(source, c, target);
+        }
+
         public static void AddEpsilonTransition(this IAutomatonBuilder @this, int source, int target)
         {
-            @this.AddTransition(source, AutomatonExtensions.Epsilon, target);
+            @this.AddTransition(source, CharSet.Epsilon, target);
         }
 
         public static void CopyTo(this IAutomaton @this, IAutomatonBuilder builder, out int oldNewStartState,

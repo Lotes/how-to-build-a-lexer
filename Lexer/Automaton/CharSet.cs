@@ -8,7 +8,15 @@ namespace Lexer.Automaton
 {
     public class CharSet: IEnumerable<CharRange>
     {
+        public const char Epsilon = '\0';
+
         private readonly List<CharRange> list = new List<CharRange>();
+
+        public CharSet(params char[] characters)
+        {
+            foreach (var c in characters)
+                Add(c);
+        }
 
         public int Length { get { return list.Sum(r => r.Count()); } }
 
@@ -102,7 +110,7 @@ namespace Lexer.Automaton
                 return;
             list.RemoveAt(index);
             if (range.From == range.To)
-                ;
+                return;
             else if (range.From == c)
                     list.Insert(index, new CharRange((char)(c+1), range.To));
             else if (range.To == c)
@@ -184,6 +192,11 @@ namespace Lexer.Automaton
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return string.Join(",", list.Select(r => r.ToString()));
         }
     }
 }

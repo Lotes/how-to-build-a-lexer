@@ -42,7 +42,7 @@ namespace Lexer.RegularExpression.Impl
             
             public char Lookahead
             {
-                get { return index >= input.Length ? AutomatonExtensions.Epsilon : input[index]; }
+                get { return index >= input.Length ? CharSet.Epsilon : input[index]; }
             }
             
             public IAutomaton Exec()
@@ -52,7 +52,7 @@ namespace Lexer.RegularExpression.Impl
                 {
                     index++;
                     var rhs = ConcatExpression();
-                    lhs = AutomatonConstructionKit.Alternate(new[]
+                    lhs = ConstructionKit.Alternate(new[]
                     {
                         lhs, rhs
                     });
@@ -63,10 +63,10 @@ namespace Lexer.RegularExpression.Impl
             private IAutomaton ConcatExpression()
             {
                 var lhs = PrimaryExpression();
-                while (Lookahead != '|' && Lookahead != AutomatonExtensions.Epsilon && Lookahead != ')')
+                while (Lookahead != '|' && Lookahead != CharSet.Epsilon && Lookahead != ')')
                 {
                     var rhs = PrimaryExpression();
-                    lhs = AutomatonConstructionKit.Concat(new[]
+                    lhs = ConstructionKit.Concat(new[]
                     {
                         lhs, rhs
                     });
@@ -79,9 +79,9 @@ namespace Lexer.RegularExpression.Impl
                 var operand = Factor();
                 switch (Lookahead)
                 {
-                    case '*': index++; return AutomatonConstructionKit.Repeat(operand);
-                    case '+': index++; return AutomatonConstructionKit.Repeat(operand, 1);
-                    case '?': index++; return AutomatonConstructionKit.Repeat(operand, 0, 1);
+                    case '*': index++; return ConstructionKit.Repeat(operand);
+                    case '+': index++; return ConstructionKit.Repeat(operand, 1);
+                    case '?': index++; return ConstructionKit.Repeat(operand, 0, 1);
                     case '{':
                         index++;
                         var min = Number();
@@ -89,14 +89,13 @@ namespace Lexer.RegularExpression.Impl
                         {
                             var max = Number();
                             Consumes('}');
-                            return AutomatonConstructionKit.Repeat(operand, min, max);
+                            return ConstructionKit.Repeat(operand, min, max);
                         }
                         else
                         {
                             Consumes('}');
-                            return AutomatonConstructionKit.Repeat(operand, min, min);
+                            return ConstructionKit.Repeat(operand, min, min);
                         }
-                        break;
                 }
                 return operand;
             }
@@ -138,7 +137,7 @@ namespace Lexer.RegularExpression.Impl
                 }
                 else
                 {
-                    var result = AutomatonConstructionKit.Consume(new[]{ Lookahead });
+                    var result = ConstructionKit.Consume(new[]{ Lookahead });
                     index++;
                     return result;   
                 }
