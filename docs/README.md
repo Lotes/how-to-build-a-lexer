@@ -10,6 +10,7 @@ Before I can parse a text, it first has do be translated into tokens. Tokens gro
 ## What are regular expressions?
 They are classes of character sequences. Each class can be described using the following operators:
 
+* Single character: `a`
 * Concatenation: `ab` (searching an `a` followed by a `b`)
 * Repetition: `a*` = `a` or `aa` or `aaa`… (finite sequence)
 * Alternation: `aa|bb` = `aa` or `bb`
@@ -45,7 +46,7 @@ To convert a regular expression into a NFA, you just have to find an automaton r
 
 ![Reading input](6-nfa-input.gv.png)
 
-### Concatenation of two DFAs
+### Concatenation
 ![Concatenation](2-nfa-concatenation.gv.png)
 
 ### Repetition
@@ -107,9 +108,10 @@ xyz
 
 ## Further readings
 *	[Alfred Aho et. al. – Compilers](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
-* [NFA construction](https://en.m.wikipedia.org/wiki/Thompson's_construction)
-* [NFA to DFA conversion](https://en.m.wikipedia.org/wiki/Powerset_construction)
-* [DFA minimization](https://en.m.wikipedia.org/wiki/DFA_minimization)
+*	Wikipedia articles
+    * [NFA construction](https://en.m.wikipedia.org/wiki/Thompson's_construction)
+    * [NFA to DFA conversion](https://en.m.wikipedia.org/wiki/Powerset_construction)
+    * [DFA minimization](https://en.m.wikipedia.org/wiki/DFA_minimization)
 *	[Github repository](https://github.com/Lotes/how-to-build-a-lexer)
 * [GraphViz](https://www.graphviz.org/) used for generating diagrams
 
