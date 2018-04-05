@@ -9,9 +9,6 @@
     <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Features\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Lexer\Lexer.csproj" />
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ namespace Lexer.Automaton
 {
     public static class ConstructionKit
     {
-        private static readonly Dictionary<char, ISet<int>> Empty = new Dictionary<char, ISet<int>>();
+        private static readonly ILookup<char?, int> Empty = new char[0].ToLookup(c => (char?)c, c => (int)c);
         public static IAutomaton Minimize(this IAutomaton @this)
         {
             //prepare NFA automaton to a DFA automaton
@@ -69,7 +69,7 @@ namespace Lexer.Automaton
                 var oldState = kv.Value;
                 var newState = kv.Key;
                 foreach (var transition in automaton.TransitionsBySource.GetOrDefault(oldState, Empty))
-                    builder.AddTransition(newState, transition.Key, mappings[transition.Value.First()]);
+                    builder.AddTransition(newState, transition.Key, mappings[transition.First()]);
             }
             //build
             return builder.Build();
@@ -79,8 +79,8 @@ namespace Lexer.Automaton
         {
             if (pairs[aIndex, bIndex] != null)
                 return pairs[aIndex, bIndex].Value;
-            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, Empty).Keys.ToArray();
-            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, Empty).Keys.ToArray();
+            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, Empty).GetKeys().ToArray();
+            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, Empty).GetKeys().ToArray();
             bool result;
             if (aInputs.Except(bInputs).Any() || bInputs.Except(aInputs).Any())
                 result = true;
@@ -136,9 +136,9 @@ namespace Lexer.Automaton
                     var transition = @this.TransitionsBySource.GetOrDefault(st);
                     if (transition == null)
                         continue;
-                    foreach (var c in transition.Keys)
+                    foreach (var c in transition.GetKeys())
                         if(c != CharSet.Epsilon)
-                            inputs.Add(c);
+                            inputs.Add(c.Value);
                 }
                 
                 //find target states (in epsilon closure)

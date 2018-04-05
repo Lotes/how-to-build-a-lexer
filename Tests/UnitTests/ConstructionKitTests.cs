@@ -74,5 +74,25 @@ namespace Tests.UnitTests
             automaton.Rejects("a");
             automaton.Rejects("aaa");
         }
+
+        [TestMethod]
+        public void StepMinimize()
+        {
+            var A = ConstructionKit.Consume(new[] { 'a' });
+            var B = ConstructionKit.Consume(new[] { 'b' });
+            var AA = ConstructionKit.Concat(new[] { A, A });
+            var AAorB = ConstructionKit.Alternate(new[] { AA, B });
+            var automaton = ConstructionKit.Repeat(AAorB)
+                .Determinize()
+                .Minimize();
+            automaton.Accepts("");
+            automaton.Accepts("aa");
+            automaton.Accepts("aa");
+            automaton.Accepts("aaaa");
+            automaton.Accepts("baab");
+            automaton.Accepts("baabaabb");
+            automaton.Rejects("a");
+            automaton.Rejects("aaa");
+        }
     }
 }

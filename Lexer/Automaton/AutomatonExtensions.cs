@@ -6,7 +6,7 @@ namespace Lexer.Automaton
 {
     public static class AutomatonExtensions
     {
-        private static IReadOnlyDictionary<char, ISet<int>> Empty = new Dictionary<char, ISet<int>>();
+        private static ILookup<char?, int> Empty = new char[0].ToLookup(c => (char?)c, c => (int)c);
         private static ISet<int> EmptyStates = new HashSet<int>();
         public static bool Read(this IAutomaton @this, string input)
         {
@@ -34,7 +34,7 @@ namespace Lexer.Automaton
                 var source = kv.Key;
                 foreach (var t in kv.Value)
                 {
-                    Console.WriteLine($"{source} --{t.Key}--> {string.Join(",", t.Value)}");
+                    Console.WriteLine($"{source} --{t.Key}--> {string.Join(",", t)}");
                 }
             }
         }

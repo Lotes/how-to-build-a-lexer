@@ -8,6 +8,8 @@ namespace Main
     {
         public static void Main(string[] args)
         {
+            new Parser().Parse(".");
+
             var parser = new Parser();
             do
             {
@@ -19,9 +21,8 @@ namespace Main
                 try
                 {
                     var automaton = parser.Parse(input);
-                    var minimized = automaton.Minimize();
-                    Console.WriteLine(minimized.StateCount+" states");
-                    minimized.Print();
+                    Console.WriteLine(automaton.StateCount+" states");
+                    automaton.Print();
                 }
                 catch (Exception e)
                 {

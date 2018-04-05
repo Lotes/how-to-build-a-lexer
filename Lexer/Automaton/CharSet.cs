@@ -6,11 +6,19 @@ using System.Linq;
 
 namespace Lexer.Automaton
 {
-    public class CharSet: IEnumerable<CharRange>
+    public class CharSet: ICharSet
     {
-        public const char Epsilon = '\0';
+        public static readonly char? Epsilon = null;
+        public static readonly ICharSet Full = new CharSet(new CharRange('\0', '\uFFFF'));
+        public static readonly ICharSet Empty = new CharSet();
 
-        private readonly List<CharRange> list = new List<CharRange>();
+        protected readonly List<CharRange> list = new List<CharRange>();
+
+        public CharSet() { }
+        public CharSet(ICharSet from)
+        {
+            list = new List<CharRange>(from);
+        }
 
         public CharSet(params char[] characters)
         {
@@ -18,7 +26,13 @@ namespace Lexer.Automaton
                 Add(c);
         }
 
-        public int Length { get { return list.Sum(r => r.Count()); } }
+        public CharSet(params CharRange[] ranges)
+        {
+            foreach (var range in ranges)
+                Add(range.From, range.To);
+        }
+
+        public int Length { get { return list.Sum(r => (int)r.To - (int)r.From) + 1; } }
 
         public bool Contains(char c)
         {

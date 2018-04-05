@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Lexer.Automaton
 {
@@ -7,6 +8,6 @@ namespace Lexer.Automaton
         int StartState { get; }
         int StateCount { get; }
         ISet<int> AcceptingStates { get; }
-        IReadOnlyDictionary<int, IReadOnlyDictionary<char, ISet<int>>> TransitionsBySource { get; }
+        IReadOnlyDictionary<int, ILookup<char?, int>> TransitionsBySource { get; }
     }
 }

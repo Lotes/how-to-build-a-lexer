@@ -1,7 +1,9 @@
-﻿namespace Lexer.RegularExpression
+﻿using Lexer.Automaton;
+
+namespace Lexer.RegularExpression
 {
     public interface IParser
     {
-        IRegularExpression Parse(string input);
+        IAutomaton Parse(string input);
     }
 }

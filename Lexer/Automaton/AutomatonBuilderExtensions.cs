@@ -27,7 +27,7 @@ namespace Lexer.Automaton
                 var transition = kv.Value;
                 foreach (var target in transition)
                 {
-                    foreach(var x in target.Value.Select(v => stateMapping[v]))
+                    foreach(var x in target.Select(v => stateMapping[v]))
                         builder.AddTransition(source, target.Key, x);
                 }
             }
