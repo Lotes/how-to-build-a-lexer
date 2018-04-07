@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lexer.Automaton.Impl;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace Lexer.Automaton
 {
     public static class AutomatonExtensions
     {
-        private static ILookup<char?, int> Empty = new char[0].ToLookup(c => (char?)c, c => (int)c);
+        public static ITransitionTargets EmptyTargets = new TransitionTargets();
         private static ISet<int> EmptyStates = new HashSet<int>();
         public static bool Read(this IAutomaton @this, string input)
         {
@@ -16,8 +17,9 @@ namespace Lexer.Automaton
             {
                 state = new HashSet<int>(
                     @this.GetEpsilonClosure(
-                        state.SelectMany(s => @this.TransitionsBySource.GetOrDefault(s, Empty)
-                            .GetOrDefault(c, EmptyStates))
+                        state.SelectMany(s => @this.TransitionsBySource
+                            .GetOrDefault(s, EmptyTargets)
+                            .ReadChar(c))
                             .ToArray()));
                 if (!state.Any())
                     return false;
@@ -50,7 +52,7 @@ namespace Lexer.Automaton
                 var source = queue.Dequeue();
                 set.Add(source);
                 var targets = @this.TransitionsBySource.GetOrDefault(source)?
-                    .GetOrDefault(CharSet.Epsilon) ?? Enumerable.Empty<int>();
+                    [CharSet.Epsilon] ?? Enumerable.Empty<int>();
                 foreach(var target in targets)
                     if(!set.Contains(target))
                         queue.Enqueue(target);

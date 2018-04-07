@@ -7,7 +7,7 @@ namespace Lexer.Automaton.Impl
     public class Automaton: IAutomaton
     {
         public Automaton(int stateCount, int startState, IEnumerable<int> acceptingStates,
-            Dictionary<int, ILookup<char?, int>> transitions)
+            Dictionary<int, ITransitionTargets> transitions)
         {
             StateCount = stateCount;
             StartState = startState;
@@ -17,6 +17,6 @@ namespace Lexer.Automaton.Impl
         public int StartState { get; }
         public int StateCount { get; }
         public ISet<int> AcceptingStates { get; }
-        public IReadOnlyDictionary<int, ILookup<char?, int>> TransitionsBySource { get; private set; }
+        public IReadOnlyDictionary<int, ITransitionTargets> TransitionsBySource { get; private set; }
     }
 }

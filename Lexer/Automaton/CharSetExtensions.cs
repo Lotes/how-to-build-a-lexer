@@ -8,6 +8,15 @@ namespace Lexer.Automaton
 {
     public static class CharSetExtensions
     {
+        public static bool Contains(this ICharSet @this, ICharSet set)
+        {
+            if (@this == null)
+                return false;
+            foreach (var range in set)
+                if (!@this.Contains(range))
+                    return false;
+            return true;
+        }
         public static void Add(this CharSet @this, ICharSet other)
         {
             foreach (var range in other)

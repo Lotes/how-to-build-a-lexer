@@ -14,7 +14,7 @@ namespace Tests.UnitTests
         [TestMethod]
         public void StepCharacter()
         {
-            var automaton = ConstructionKit.Consume(new[] { 'a', 'b', 'c' });
+            var automaton = ConstructionKit.Consume(new CharSet('a', 'b', 'c' ));
             automaton.Accepts("a");
             automaton.Accepts("b");
             automaton.Accepts("c");
@@ -24,8 +24,8 @@ namespace Tests.UnitTests
         [TestMethod]
         public void StepConcatenation()
         {
-            var A = ConstructionKit.Consume(new[] { 'a' });
-            var B = ConstructionKit.Consume(new[] { 'b' });
+            var A = ConstructionKit.Consume(new CharSet('a'));
+            var B = ConstructionKit.Consume(new CharSet('b'));
             var automaton = ConstructionKit.Concat(new[] { A, B });
             automaton.Accepts("ab");
             automaton.Rejects("ba");
@@ -34,8 +34,8 @@ namespace Tests.UnitTests
         [TestMethod]
         public void StepAlternation()
         {
-            var A = ConstructionKit.Consume(new[] { 'a' });
-            var B = ConstructionKit.Consume(new[] { 'b' });
+            var A = ConstructionKit.Consume(new CharSet('a'));
+            var B = ConstructionKit.Consume(new CharSet('b'));
             var AA = ConstructionKit.Concat(new[] { A, A });
             var automaton = ConstructionKit.Alternate(new[] { AA, B });
             automaton.Accepts("b");
@@ -47,7 +47,7 @@ namespace Tests.UnitTests
         [TestMethod]
         public void StepRepetition()
         {
-            var A = ConstructionKit.Consume(new[] { 'a' });
+            var A = ConstructionKit.Consume(new CharSet('a'));
             var automaton = ConstructionKit.Repeat(A);
             automaton.Accepts("");
             automaton.Accepts("a");
@@ -59,8 +59,8 @@ namespace Tests.UnitTests
         [TestMethod]
         public void StepDeterminize()
         {
-            var A = ConstructionKit.Consume(new[] { 'a' });
-            var B = ConstructionKit.Consume(new[] { 'b' });
+            var A = ConstructionKit.Consume(new CharSet('a'));
+            var B = ConstructionKit.Consume(new CharSet('b'));
             var AA = ConstructionKit.Concat(new[] { A, A });
             var AAorB = ConstructionKit.Alternate(new[] { AA, B });
             var automaton = ConstructionKit.Repeat(AAorB)
@@ -78,8 +78,8 @@ namespace Tests.UnitTests
         [TestMethod]
         public void StepMinimize()
         {
-            var A = ConstructionKit.Consume(new[] { 'a' });
-            var B = ConstructionKit.Consume(new[] { 'b' });
+            var A = ConstructionKit.Consume(new CharSet('a'));
+            var B = ConstructionKit.Consume(new CharSet('b'));
             var AA = ConstructionKit.Concat(new[] { A, A });
             var AAorB = ConstructionKit.Alternate(new[] { AA, B });
             var automaton = ConstructionKit.Repeat(AAorB)

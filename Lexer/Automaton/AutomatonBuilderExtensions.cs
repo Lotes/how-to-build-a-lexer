@@ -7,7 +7,8 @@ namespace Lexer.Automaton
     {
         public static void AddTransition(this IAutomatonBuilder @this, int source, char c, int target)
         {
-            @this.AddTransition(source, c, target);
+            var charset = new CharSet(c);
+            @this.AddTransition(source, charset, target);
         }
 
         public static void AddEpsilonTransition(this IAutomatonBuilder @this, int source, int target)

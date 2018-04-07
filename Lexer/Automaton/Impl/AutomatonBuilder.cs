@@ -7,7 +7,7 @@ namespace Lexer.Automaton.Impl
     public class AutomatonBuilder : IAutomatonBuilder
     {
         private int StateCounter = 0;
-        private Dictionary<int, Lookup> transitions = new Dictionary<int, Lookup>();
+        private Dictionary<int, TransitionTargets> transitions = new Dictionary<int, TransitionTargets>();
         private int startState = -1;
         private HashSet<int> acceptingStates = new HashSet<int>();
         
@@ -16,12 +16,12 @@ namespace Lexer.Automaton.Impl
             return StateCounter++;
         }
 
-        public void AddTransition(int source, char? character, int target)
+        public void AddTransition(int source, ICharSet characters, int target)
         {
             if(source < 0 || source >= StateCounter) throw new ArgumentException(nameof(source));
             if(target < 0 || target >= StateCounter) throw new ArgumentException(nameof(target));
-            transitions.GetValueOrInsertedLazyDefault(source, () => new Lookup())
-                .Add(character, target);
+            transitions.GetValueOrInsertedLazyDefault(source, () => new TransitionTargets())
+                .Add(characters, target);
         }
 
         public void SetStartState(int state)
@@ -43,7 +43,7 @@ namespace Lexer.Automaton.Impl
             if(startState == -1)
                 throw new InvalidOperationException("No start defined!");
             return new Automaton(StateCounter, startState, acceptingStates, 
-                transitions.ToDictionary(kv => kv.Key, kv => (ILookup<char?, int>)kv.Value));
+                transitions.ToDictionary(kv => kv.Key, kv => (ITransitionTargets)kv.Value));
         }
     }
 }

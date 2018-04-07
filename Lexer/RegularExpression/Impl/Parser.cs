@@ -320,12 +320,12 @@ namespace Lexer.RegularExpression.Impl
                     }
                     if (negate)
                         chars = chars.Negate();
-                    return ConstructionKit.Consume(chars.SelectMany(r => r));
+                    return ConstructionKit.Consume(chars);
                 }
                 else
                 {
                     var ch = CharRange();
-                    return ConstructionKit.Consume(ch.SelectMany(cc => cc));
+                    return ConstructionKit.Consume(ch);
                 }
             }
 

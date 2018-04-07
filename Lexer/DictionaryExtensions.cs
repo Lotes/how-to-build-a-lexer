@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lexer.Automaton;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -99,15 +100,6 @@ namespace Lexer
             }
 
             return @default;
-        }
-        
-        public static IEnumerable<TValue> GetOrDefault<TKey, TValue>(this ILookup<TKey, TValue> _this, TKey key, IEnumerable<TValue> @default = null)
-        {
-            if (_this.Contains(key))
-            {
-                return _this[key];
-            }
-            return @default ?? Enumerable.Empty<TValue>();
         }
 
         public static IEnumerable<TKey> GetKeys<TKey, TValue>(this ILookup<TKey, TValue> @this)

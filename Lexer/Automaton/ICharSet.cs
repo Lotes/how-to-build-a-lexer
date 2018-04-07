@@ -2,7 +2,7 @@
 
 namespace Lexer.Automaton
 {
-    public interface ICharSet : IEnumerable<CharRange>
+    public interface ICharSet : IEnumerable<CharRange>, IComparer<ICharSet>
     {
         int Length { get; }
         bool Contains(char c);

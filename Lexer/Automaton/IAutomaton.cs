@@ -8,6 +8,6 @@ namespace Lexer.Automaton
         int StartState { get; }
         int StateCount { get; }
         ISet<int> AcceptingStates { get; }
-        IReadOnlyDictionary<int, ILookup<char?, int>> TransitionsBySource { get; }
+        IReadOnlyDictionary<int, ITransitionTargets> TransitionsBySource { get; }
     }
 }

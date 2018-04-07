@@ -8,7 +8,7 @@ namespace Lexer.Automaton
 {
     public class CharSet: ICharSet
     {
-        public static readonly char? Epsilon = null;
+        public static readonly ICharSet Epsilon = null;
         public static readonly ICharSet Full = new CharSet(new CharRange('\0', '\uFFFF'));
         public static readonly ICharSet Empty = new CharSet();
 
@@ -32,7 +32,7 @@ namespace Lexer.Automaton
                 Add(range.From, range.To);
         }
 
-        public int Length { get { return list.Sum(r => (int)r.To - (int)r.From) + 1; } }
+        public int Length { get { return list.Sum(r => (int)r.To - (int)r.From + 1); } }
 
         public bool Contains(char c)
         {
@@ -211,6 +211,39 @@ namespace Lexer.Automaton
         public override string ToString()
         {
             return string.Join(",", list.Select(r => r.ToString()));
+        }
+
+        public override int GetHashCode()
+        {
+            return list.Aggregate(0, (sum, original) => sum * 13 + original.GetHashCode());
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as ICharSet;
+            if (other == null || this.Count() !=  other.Count())
+                return false;
+            return this.Zip(other, (lhs, rhs) => lhs.Equals(rhs))
+                .Aggregate(true, (lhs, rhs) => lhs && rhs);
+        }
+
+        public int Compare(ICharSet x, ICharSet y)
+        {
+            if (x == null && y == null)
+                return 0;
+            if (x == null)
+                return -1;
+            if (y == null)
+                return +1;
+            if (x.Length == 0 && y.Length == 0)
+                return 0;
+            if (x.Length == 0)
+                return -1;
+            if (y.Length == 0)
+                return +1;
+            var lhs = x.First().First();
+            var rhs = y.First().First();
+            return lhs.CompareTo(rhs);
         }
     }
 }

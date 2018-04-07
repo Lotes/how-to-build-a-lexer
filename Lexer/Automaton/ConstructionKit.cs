@@ -9,7 +9,6 @@ namespace Lexer.Automaton
 {
     public static class ConstructionKit
     {
-        private static readonly ILookup<char?, int> Empty = new char[0].ToLookup(c => (char?)c, c => (int)c);
         public static IAutomaton Minimize(this IAutomaton @this)
         {
             //prepare NFA automaton to a DFA automaton
@@ -68,7 +67,7 @@ namespace Lexer.Automaton
             {
                 var oldState = kv.Value;
                 var newState = kv.Key;
-                foreach (var transition in automaton.TransitionsBySource.GetOrDefault(oldState, Empty))
+                foreach (var transition in automaton.TransitionsBySource.GetOrDefault(oldState, AutomatonExtensions.EmptyTargets))
                     builder.AddTransition(newState, transition.Key, mappings[transition.First()]);
             }
             //build
@@ -79,8 +78,8 @@ namespace Lexer.Automaton
         {
             if (pairs[aIndex, bIndex] != null)
                 return pairs[aIndex, bIndex].Value;
-            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, Empty).GetKeys().ToArray();
-            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, Empty).GetKeys().ToArray();
+            var aInputs = automaton.TransitionsBySource.GetOrDefault(aIndex, AutomatonExtensions.EmptyTargets).GetKeys().ToArray();
+            var bInputs = automaton.TransitionsBySource.GetOrDefault(bIndex, AutomatonExtensions.EmptyTargets).GetKeys().ToArray();
             bool result;
             if (aInputs.Except(bInputs).Any() || bInputs.Except(aInputs).Any())
                 result = true;
@@ -112,7 +111,7 @@ namespace Lexer.Automaton
             var newStates = new Dictionary<decimal, int>();
             var start = @this.GetEpsilonClosure(@this.StartState);
             var queue = new Queue<IEnumerable<int>>();
-            var transitions = new LinkedList<Tuple<decimal, char, decimal>>();
+            var transitions = new LinkedList<Tuple<decimal, ICharSet, decimal>>();
             queue.Enqueue(start);
             while (queue.Any())
             {
@@ -130,15 +129,33 @@ namespace Lexer.Automaton
                     builder.AcceptState(state);
                 
                 //get all possible inputs
-                var inputs = new HashSet<char>();
+                var inputs = new List<ICharSet>();
                 foreach (var st in source)
                 {
-                    var transition = @this.TransitionsBySource.GetOrDefault(st);
-                    if (transition == null)
+                    var transitionTargets = @this.TransitionsBySource.GetOrDefault(st);
+                    if (transitionTargets == null)
                         continue;
-                    foreach (var c in transition.GetKeys())
-                        if(c != CharSet.Epsilon)
-                            inputs.Add(c.Value);
+                    foreach (var lhs in transitionTargets.GetKeys())
+                    {
+                        if (lhs != CharSet.Epsilon)
+                        {
+                            // A \ B
+                            // B \ A
+                            // A ^ B
+                            var distinct = true;
+                            inputs = inputs.SelectMany(rhs => 
+                            {
+                                var first = lhs.Except(rhs);
+                                var second = rhs.Except(lhs);
+                                var third = lhs.Intersect(rhs);
+                                if (third.Any())
+                                    distinct = false;
+                                return new[] { first, second, third }.Where(a => a.Length > 0);
+                            }).ToList();
+                            if(distinct)
+                                inputs.Add(lhs);
+                        }
+                    }
                 }
                 
                 //find target states (in epsilon closure)
@@ -148,7 +165,7 @@ namespace Lexer.Automaton
                     foreach (var st in source)
                     {
                         var transition = @this.TransitionsBySource.GetOrDefault(st);
-                        var targets = transition?.GetOrDefault(c);
+                        var targets = transition?.ReadSet(c);
                         if (targets == null)
                             continue;
                         foreach (var target in targets)
@@ -158,7 +175,7 @@ namespace Lexer.Automaton
                     {
                         var epsilonTarget = @this.GetEpsilonClosure(dfaState.ToArray());
                         var targetBits = epsilonTarget.ToBits();
-                        transitions.AddLast(new Tuple<decimal, char, decimal>(sourceBits, c, targetBits));
+                        transitions.AddLast(new Tuple<decimal, ICharSet, decimal>(sourceBits, c, targetBits));
                         queue.Enqueue(epsilonTarget);
                     }
                 }
@@ -172,15 +189,14 @@ namespace Lexer.Automaton
             }
             return builder.Build();
         }
-        public static IAutomaton Consume(IEnumerable<char> characters)
+        public static IAutomaton Consume(ICharSet characters)
         {
             var builder = new AutomatonBuilder();
             var start = builder.AddState();
             var end = builder.AddState();
             builder.SetStartState(start);
             builder.AcceptState(end);
-            foreach(var character in characters)
-                builder.AddTransition(start, character, end);
+            builder.AddTransition(start, characters, end);
             return builder.Build();
         }
         public static IAutomaton Alternate(IEnumerable<IAutomaton> automata)
