@@ -159,7 +159,7 @@ namespace Lexer.RegularExpression.Impl
                 if (entry.Value == CharType.Special)
                     escapesTo[entry.Key.ToString()] = new CharSet(entry.Key);
 
-            escapesTo["."] = CharSet.Full;
+            escapesTo["."] = new CharSet('.');
             escapesTo["d"] = new CharSet(new CharRange('0', '9'));
             escapesTo["n"] = new CharSet('\n');
             escapesTo["r"] = new CharSet('\r');

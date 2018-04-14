@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lexer.Automaton
 {
-    public interface ICharSet : IEnumerable<CharRange>, IComparer<ICharSet>
+    public interface ICharSet : IEnumerable<CharRange>, IComparable<ICharSet>
     {
         int Length { get; }
         bool Includes(char c);

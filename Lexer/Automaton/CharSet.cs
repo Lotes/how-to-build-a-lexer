@@ -16,6 +16,7 @@ namespace Lexer.Automaton
 
         public CharSet() { list.Add(new CharRange('\0', '\uFFFF', SetMode.Excluded)); }
         public CharSet(ICharSet from)
+            : this()
         {
             foreach (var range in from)
                 Add(range.From, range.To);
@@ -85,7 +86,7 @@ namespace Lexer.Automaton
                 leftMostIndex++;
 
             var rightMostIndex = list.Count - 1;
-            while (rightMostIndex < list.Count && to < list[rightMostIndex].From)
+            while (rightMostIndex >= 0 && to < list[rightMostIndex].From)
                 rightMostIndex--;
 
             var leftMostRange = list[leftMostIndex];
@@ -134,7 +135,6 @@ namespace Lexer.Automaton
             }
 
             TryMergeRange(Math.Max(0, leftMostIndex-1), 4);
-            Console.WriteLine(this);
         }
 
         public void Add(char c)
@@ -203,8 +203,10 @@ namespace Lexer.Automaton
                 .Aggregate(true, (lhs, rhs) => lhs && rhs);
         }
 
-        public int Compare(ICharSet x, ICharSet y)
+        public int CompareTo(ICharSet other)
         {
+            var x = this;
+            var y = other;
             if (x == null && y == null)
                 return 0;
             if (x == null)
