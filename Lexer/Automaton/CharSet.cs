@@ -9,43 +9,42 @@ namespace Lexer.Automaton
     public class CharSet: ICharSet
     {
         public static readonly ICharSet Epsilon = null;
-        public static readonly ICharSet Full = new CharSet(new CharRange('\0', '\uFFFF'));
+        public static readonly ICharSet Full = new CharSet(new CharRange('\0', '\uFFFF', SetMode.Included));
         public static readonly ICharSet Empty = new CharSet();
 
         protected readonly List<CharRange> list = new List<CharRange>();
 
-        public CharSet() { }
+        public CharSet() { list.Add(new CharRange('\0', '\uFFFF', SetMode.Excluded)); }
         public CharSet(ICharSet from)
         {
-            list = new List<CharRange>(from);
+            foreach (var range in from)
+                Add(range.From, range.To);
         }
 
         public CharSet(params char[] characters)
+            : this()
         {
             foreach (var c in characters)
                 Add(c);
         }
 
         public CharSet(params CharRange[] ranges)
+            : this()
         {
             foreach (var range in ranges)
                 Add(range.From, range.To);
         }
 
-        public int Length { get { return list.Sum(r => (int)r.To - (int)r.From + 1); } }
-
-        public bool Contains(char c)
+        public int Length
         {
-            var index = 0;
-            while (index < list.Count && c > list[index].To)
-                index++;
-            if (index >= list.Count)
-                return false;
-            var range = list[index];
-            return c >= range.From && c <= range.To;
+            get
+            {
+                return list.Where(r => r.Mode == SetMode.Included)
+                    .Sum(r => (int)r.To - (int)r.From + 1);
+            }
         }
-        
-        public bool Contains(char from, char to)
+
+        private bool IsXXcluded(SetMode mode, char from, char to)
         {
             var index = 0;
             while (index < list.Count && from > list[index].To)
@@ -53,154 +52,131 @@ namespace Lexer.Automaton
             if (index >= list.Count)
                 return false;
             var range = list[index];
-            return from >= range.From && to <= range.To;
+            return from >= range.From && to <= range.To && range.Mode == mode;
+        }
+
+        public bool Includes(char c)
+        {
+            return Includes(c, c);
         }
         
-        public void Add(char c)
+        public bool Includes(char from, char to)
         {
-            var index = 0;
-            while (index < list.Count && c > list[index].To)
-                index++;
-            if (index >= list.Count)
+            return IsXXcluded(SetMode.Included, from, to);
+        }
+
+        public bool Excludes(char c)
+        {
+            return Excludes(c, c);
+        }
+
+        public bool Excludes(char from, char to)
+        {
+            return IsXXcluded(SetMode.Excluded, from, to);
+        }
+
+        private void Change(SetMode mode, char from, char to)
+        {
+            if (from > to)
+                throw new ArgumentException("Range limit order is invalid!", nameof(from));
+
+            var leftMostIndex = 0;
+            while (leftMostIndex < list.Count && from > list[leftMostIndex].To)
+                leftMostIndex++;
+
+            var rightMostIndex = list.Count - 1;
+            while (rightMostIndex < list.Count && to < list[rightMostIndex].From)
+                rightMostIndex--;
+
+            var leftMostRange = list[leftMostIndex];
+            var rightMostRange = list[rightMostIndex];
+            var leftMost = leftMostRange.From;
+            var rightMost = rightMostRange.To;
+            list.RemoveRange(leftMostIndex, rightMostIndex - leftMostIndex + 1);
+
+            if(leftMost < from)
             {
-                list.Add(new CharRange(c));
-                TryMergeRange(index);
+                if(rightMost > to)
+                {
+                    list.InsertRange(leftMostIndex, new[] 
+                    {
+                        new CharRange(leftMost, (char)(from-1), leftMostRange.Mode),
+                        new CharRange(from, to, mode),
+                        new CharRange((char)(to+1), rightMost, rightMostRange.Mode)
+                    });
+                }
+                else
+                {
+                    list.InsertRange(leftMostIndex, new[]
+                    {
+                        new CharRange(leftMost, (char)(from - 1), leftMostRange.Mode),
+                        new CharRange(from, to, mode)
+                    });
+                }
             }
             else
             {
-                var range = list[index];
-                if(c >= range.From && c <= range.To)
-                    return; //already included
-                if (c > range.To)
+                if (rightMost > to)
                 {
-                    list.Insert(index + 1, new CharRange(c));
-                    TryMergeRange(index + 1);
-                }    
-                else // c < range.From
+                    list.InsertRange(leftMostIndex, new[]
+                    {
+                        new CharRange(from, to, mode),
+                        new CharRange((char)(to + 1), rightMost, rightMostRange.Mode)
+                    });
+                }
+                else
                 {
-                    list.Insert(index, new CharRange(c));
-                    TryMergeRange(index);
+                    list.InsertRange(leftMostIndex, new[]
+                    {
+                        new CharRange(from, to, mode)
+                    });
                 }
             }
+
+            TryMergeRange(Math.Max(0, leftMostIndex-1), 4);
+            Console.WriteLine(this);
+        }
+
+        public void Add(char c)
+        {
+            Add(c, c);
         }
 
         public void Add(char from, char to)
         {
-            var index = 0;
-            while (index < list.Count && from > list[index].To)
-                index++;
-            if (index >= list.Count)
-            {
-                list.Add(new CharRange(from, to));
-                TryMergeRange(index);
-            }
-            else
-            {
-                var fromIndex = index;
-                while (index < list.Count && from > list[index].To)
-                    index++;
-                if(index < list.Count)
-                {
-                    if (from > list[index].From)
-                    {
-                        from = list[index].From;
-                        list.RemoveRange(fromIndex, index - fromIndex + 1);
-                    }
-                }
-                list.Insert(fromIndex, new CharRange(from, to));
-                TryMergeRange(fromIndex);
-            }
+            Change(SetMode.Included, from, to);
         }
 
         public void Remove(char c)
         {
-            var index = 0;
-            while (index < list.Count && c > list[index].To)
-                index++;
-            if (index >= list.Count)
-                return;
-            var range = list[index];
-            if (c < range.From || c > range.To)
-                return;
-            list.RemoveAt(index);
-            if (range.From == range.To)
-                return;
-            else if (range.From == c)
-                    list.Insert(index, new CharRange((char)(c+1), range.To));
-            else if (range.To == c)
-                list.Insert(index, new CharRange(range.From, (char)(c - 1)));
-            else
-            {
-                list.Insert(index, new CharRange(range.From, (char)(c - 1)));
-                list.Insert(index+1, new CharRange((char)(c + 1), range.To));
-            }
+            Remove(c, c);
         }
 
         public void Remove(char from, char to)
         {
-            var index = 0;
-            while (index < list.Count && from > list[index].To)
-                index++;
-            if (index >= list.Count)
-                return;
-            var range = list[index];
-            if (from > range.To)
-                return; //nothing to do
-            list.RemoveAt(index);
-            //  a-c e-g
-            //       ^
-            //remove f-i
-            if (range.From <= from - 1)
-            {
-                list.Insert(index, new CharRange(range.From, (char)(from - 1)));
-                index++;
-                while (index < list.Count && to < list[index].From)
-                    list.RemoveAt(index);
-                if (index < list.Count)
-                {
-                    range = list[index];
-                    list.RemoveAt(index);
-                    list.Insert(index, new CharRange((char)(to + 1), range.To));
-                }
-            }
-            //        b-d   
-            //       ^
-            //remove a-c
-            else //range.From > from-1
-            {
-                if(to+1 <= range.To)
-                    list.Insert(index, new CharRange((char)(to+1), range.To));
-            }
+            Change(SetMode.Excluded, from, to);
         }
 
-        private void TryMergeRange(int index)
+        private void TryMergeRange(int fromRange, int toRange)
         {
-            var current = list[index];
-            //check after
-            if (index + 1 < list.Count)
+            var index = fromRange;
+            while(index < toRange && index + 1 < list.Count)
             {
-                var after = list[index + 1];
-                if (after.From == current.To + 1)
+                var current = list[index];
+                var next = list[index+1];
+                if (current.Mode == next.Mode && current.To + 1 == next.From)
                 {
                     list.RemoveRange(index, 2);
-                    list.Insert(index, current = new CharRange(current.From, after.To));
+                    list.Insert(index, new CharRange(current.From, next.To, current.Mode));
                 }
-            }
-            //check before
-            if (index - 1 >= 0)
-            {
-                var before = list[index - 1];
-                if (before.To + 1 == current.From)
-                {
-                    list.RemoveRange(index-1, 2);
-                    list.Insert(index-1, new CharRange(before.From, current.To));
-                }
+                else
+                    index++;
             }
         }
 
         public IEnumerator<CharRange> GetEnumerator()
         {
-            return list.GetEnumerator();
+            return list.Where(r => r.Mode == SetMode.Included).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

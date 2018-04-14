@@ -281,7 +281,7 @@ namespace Lexer.RegularExpression.Impl
 
             private bool MayConsume(CharSet c)
             {
-                if (!c.Contains(Lookahead)) return false;
+                if (!c.Includes(Lookahead)) return false;
                 index++;
                 return true;
             }

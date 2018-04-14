@@ -16,7 +16,7 @@ namespace Lexer.Automaton
     {
         public static IEnumerable<int> ReadChar(this ITransitionTargets _this, char key)
         {
-            return _this.Where(g => g.Key != null && g.Key.Contains(key)).SelectMany(g => g).ToArray();
+            return _this.Where(g => g.Key != null && g.Key.Includes(key)).SelectMany(g => g).ToArray();
         }
         
         public static IEnumerable<int> ReadSet(this ITransitionTargets @this, ICharSet set)

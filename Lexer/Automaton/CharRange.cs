@@ -9,14 +9,16 @@ namespace Lexer.Automaton
         public CharRange(char single)
             : this(single, single) {}
         
-        public CharRange(char from, char to)
+        public CharRange(char from, char to, SetMode mode = SetMode.Included)
         {
             if(from > to)
                 throw  new ArgumentException(nameof(from));
             From = from;
             To = to;
+            Mode = mode;
         }
  
+        public SetMode Mode { get; }
         public char From { get; }
         public char To { get; }
         
@@ -24,7 +26,12 @@ namespace Lexer.Automaton
         {
             return c >= From && c <= To;
         }
-        
+
+        public CharRange Clone()
+        {
+            return new CharRange(From, To, Mode);
+        }
+
         public IEnumerator<char> GetEnumerator()
         {
             for(char index=From; index<=To; index++)
@@ -50,7 +57,7 @@ namespace Lexer.Automaton
 
         public override string ToString()
         {
-            return From == To ? From.ToString() : From+"-"+To;
+            return "[" + (Mode == SetMode.Excluded ? "^" : "") + (From == To ? ((int)From).ToString() : ((int)From).ToString()+"-"+((int)To).ToString()) + "]";
         }
     }
 }

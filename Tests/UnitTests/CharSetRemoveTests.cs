@@ -52,8 +52,8 @@ namespace Tests.UnitTests
             charset.Add('a', 'c');
             charset.Remove('b');
             Assert.AreEqual(2, charset.Length);
-            Assert.IsTrue(charset.Contains('a'));
-            Assert.IsTrue(charset.Contains('c'));
+            Assert.IsTrue(charset.Includes('a'));
+            Assert.IsTrue(charset.Includes('c'));
         }
 
         [TestMethod]
@@ -63,8 +63,8 @@ namespace Tests.UnitTests
             charset.Add('a', 'c');
             charset.Remove('a');
             Assert.AreEqual(2, charset.Length);
-            Assert.IsTrue(charset.Contains('b'));
-            Assert.IsTrue(charset.Contains('c'));
+            Assert.IsTrue(charset.Includes('b'));
+            Assert.IsTrue(charset.Includes('c'));
         }
 
         [TestMethod]
@@ -74,8 +74,8 @@ namespace Tests.UnitTests
             charset.Add('a', 'c');
             charset.Remove('c');
             Assert.AreEqual(2, charset.Length);
-            Assert.IsTrue(charset.Contains('a'));
-            Assert.IsTrue(charset.Contains('b'));
+            Assert.IsTrue(charset.Includes('a'));
+            Assert.IsTrue(charset.Includes('b'));
         }
 
         [TestMethod]
@@ -94,7 +94,7 @@ namespace Tests.UnitTests
             charset.Add('a', 'c');
             charset.Remove('b', 'd');
             Assert.AreEqual(1, charset.Length);
-            Assert.IsTrue(charset.Contains('a'));
+            Assert.IsTrue(charset.Includes('a'));
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace Tests.UnitTests
             charset.Add('b', 'd');
             charset.Remove('a', 'c');
             Assert.AreEqual(1, charset.Length);
-            Assert.IsTrue(charset.Contains('d'));
+            Assert.IsTrue(charset.Includes('d'));
         }
     }
 }

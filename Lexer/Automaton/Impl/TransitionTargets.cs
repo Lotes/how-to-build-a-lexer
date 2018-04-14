@@ -121,7 +121,7 @@ namespace Lexer.Automaton.Impl
         public bool Contains(char c)
         {
             foreach (var key in nodes.Keys)
-                if (key.Contains(c))
+                if (key.Includes(c))
                     return true;
             return false;
         }
