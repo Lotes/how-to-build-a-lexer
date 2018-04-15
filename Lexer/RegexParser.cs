@@ -7,22 +7,15 @@ using System.Threading;
 using System.Xml.Schema;
 using Lexer.Automaton;
 
-namespace Lexer.RegularExpression.Impl
+namespace Lexer
 {
-    public enum CharType
+    public class RegexParser: IRegexParser
     {
-        Invalid,
-        Special,
-        Literal
-    }
-
-    public class Parser: IParser
-    {
-        public static readonly CharSet HexChars = new CharSet(new CharRange('0', '9'), new CharRange('a', 'f'), new CharRange('A', 'Z'));
+        public static readonly ICharSet HexChars = new CharSet(new CharRange('0', '9'), new CharRange('a', 'f'), new CharRange('A', 'Z'));
         public static readonly Dictionary<string, ICharSet> escapesTo = new Dictionary<string, ICharSet>();
         public static readonly Dictionary<char, CharType> asciiTable = new Dictionary<char, CharType>();
 
-        static Parser()
+        static RegexParser()
         {
             asciiTable['\u0000'] = CharType.Invalid;
             asciiTable['\u0001'] = CharType.Invalid;
@@ -279,7 +272,7 @@ namespace Lexer.RegularExpression.Impl
                 return true;
             }
 
-            private bool MayConsume(CharSet c)
+            private bool MayConsume(ICharSet c)
             {
                 if (!c.Includes(Lookahead)) return false;
                 index++;

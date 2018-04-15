@@ -1,5 +1,5 @@
-﻿using Lexer.Automaton;
-using Lexer.RegularExpression.Impl;
+﻿using Lexer;
+using Lexer.Automaton;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace Tests.UnitTests
     {
         private IAutomaton ParseRegex(string input)
         {
-            return new Parser().Parse(input);
+            return Regex.Parse(input);
         }
 
         [TestMethod]

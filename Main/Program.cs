@@ -1,6 +1,6 @@
 ﻿using System;
+using Lexer;
 using Lexer.Automaton;
-using Lexer.RegularExpression.Impl;
 
 namespace Main
 {
@@ -8,9 +8,7 @@ namespace Main
     {
         public static void Main(string[] args)
         {
-            new Parser().Parse(".");
-
-            var parser = new Parser();
+            var parser = new RegexParser();
             do
             {
                 Console.WriteLine("Please enter a regular expression!");
@@ -21,7 +19,6 @@ namespace Main
                 try
                 {
                     var automaton = parser.Parse(input);
-                    Console.WriteLine(automaton.StateCount+" states");
                     automaton.Print();
                 }
                 catch (Exception e)

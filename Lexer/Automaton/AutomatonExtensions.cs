@@ -15,16 +15,19 @@ namespace Lexer.Automaton
             var state = new HashSet<int>(@this.GetEpsilonClosure(@this.StartState));
             foreach(var c in input)
             {
-                state = new HashSet<int>(
-                    @this.GetEpsilonClosure(
-                        state.SelectMany(s => @this.TransitionsBySource
-                            .GetOrDefault(s, EmptyTargets)
-                            .ReadChar(c))
-                            .ToArray()));
+                state = new HashSet<int>(@this.Step(state, c));
                 if (!state.Any())
                     return false;
             }
             return @this.AcceptingStates.Intersect(state).Any();
+        }
+
+        public static IEnumerable<int> Step(this IAutomaton @this, IEnumerable<int> state, char character)
+        {
+            return @this.GetEpsilonClosure(state.SelectMany(s => @this.TransitionsBySource
+                .GetOrDefault(s, EmptyTargets)
+                .ReadChar(character))
+                .ToArray());
         }
 
         public static void Print(this IAutomaton @this)

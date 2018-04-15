@@ -24,18 +24,32 @@ Basically it is a certain class of state machine. A deterministic finite automat
 
 ![Example](1-nfa-example.gv.png)
 
-Circles represent state. Double cycles are accepting states. Transitions are labelled with input symbols. The input symbol `&epsilon;` is the `EMPTY` input (no character).
+Cycles represent state. Double cycles are accepting states. Transitions are labelled with input symbols. The input symbol `&epsilon;` is the `EMPTY` input (no character).
 
 ### The `IAutomaton` Interface
 
 ```csharp
 public interface IAutomaton
 {
-  int StartState { get; }
-  int StateCount { get; }
-  ISet<int> AcceptingStates { get; }
-  //source -> input symbol -> targets
-  IReadOnlyDictionary<int, IReadOnlyDictionary<char, ISet<int>>> TransitionsBySource { get; }
+    int StartState { get; }
+    int StateCount { get; }
+    ISet<int> AcceptingStates { get; }
+    IReadOnlyDictionary<int, ITransitionTargets> TransitionsBySource { get; }
+}
+
+public interface ITransitionTargets: ILookup<ICharSet, int>
+{
+    bool Contains(char c);
+    bool ContainsEpsilon();
+}
+
+public interface ICharSet : IEnumerable<CharRange>, IComparable<ICharSet>
+{
+    int Length { get; }
+    bool Includes(char c);
+    bool Includes(char from, char to);
+    bool Excludes(char c);
+    bool Excludes(char from, char to);
 }
 ```
 
@@ -100,10 +114,10 @@ Great the automata resulting from a regular expression are complete and minimal.
 
 ## Finally: The lexer!
 
-The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach would be a for loop over the set of regular expressions until one does match. But this is boring. I will combine all regular expressions with the alternate operator `|`. All I need is a feedback which regular expression has matched and how far (when multiple expressions matches, tell me all of them).
+The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach is a for loop over the set of regular expressions until one does match.
 
-```
-xyz
+```csharp
+
 ```
 
 ## Further readings

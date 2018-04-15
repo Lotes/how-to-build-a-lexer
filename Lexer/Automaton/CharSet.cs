@@ -186,7 +186,7 @@ namespace Lexer.Automaton
 
         public override string ToString()
         {
-            return string.Join(",", list.Select(r => r.ToString()));
+            return string.Join(",", list == null ? new string[] { } : list.Where(r => r.Mode == SetMode.Included).Select(r => r.ToString()));
         }
 
         public override int GetHashCode()

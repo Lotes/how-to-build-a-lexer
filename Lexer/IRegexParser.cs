@@ -1,8 +1,8 @@
 ﻿using Lexer.Automaton;
 
-namespace Lexer.RegularExpression
+namespace Lexer
 {
-    public interface IParser
+    public interface IRegexParser
     {
         IAutomaton Parse(string input);
     }
