@@ -116,10 +116,6 @@ Great the automata resulting from a regular expression are complete and minimal.
 
 The task now is to transform a text with a set of regular expressions into ordered set of tokens. So, the trivial approach is a for loop over the set of regular expressions until one does match.
 
-```csharp
-
-```
-
 ## Further readings
 *	[Alfred Aho et. al. – Compilers](https://www.amazon.com/Compilers-Principles-Techniques-Tools-2nd/dp/0321486811)
 *	Wikipedia articles
@@ -128,6 +124,3 @@ The task now is to transform a text with a set of regular expressions into order
     * [DFA minimization](https://en.m.wikipedia.org/wiki/DFA_minimization)
 *	[Github repository](https://github.com/Lotes/how-to-build-a-lexer)
 * [GraphViz](https://www.graphviz.org/) used for generating diagrams
-
-## TODO
-* show some interfaces... (code)
