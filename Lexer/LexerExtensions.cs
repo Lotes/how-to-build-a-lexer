@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Lexer
 {
@@ -15,7 +16,20 @@ namespace Lexer
                 index += token.Value.Length;
             }
             if (index < input.Length)
-                throw new InvalidOperationException("EOF not reached!");
+                throw new LexerExecutionException("EOF not reached!");
+        }
+
+        public static string Times(this string str, int factor)
+        {
+            if (factor < 0)
+                throw new ArgumentException("Factor must be non-negative!", nameof(factor));
+            var builder = new StringBuilder(str.Length*factor);
+            while(factor > 0)
+            {
+                builder.Append(str);
+                factor--;
+            }
+            return builder.ToString();
         }
     }
 }

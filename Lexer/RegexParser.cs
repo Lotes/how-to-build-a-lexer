@@ -255,7 +255,7 @@ namespace Lexer
             private int Number()
             {
                 if(Lookahead < '0' || Lookahead > '9')
-                    throw new InvalidOperationException("Digit expected, but '"+Lookahead+"' found!");
+                    throw new RegexParserException(index, "Digit expected, but '"+Lookahead+"' found!");
                 var num = "";
                 while (Lookahead >= '0' && Lookahead <= '9')
                 {
@@ -290,7 +290,7 @@ namespace Lexer
             private void Consumes(char c)
             {
                 if(Lookahead != c)
-                    throw new InvalidOperationException("'"+c+"' expected, but '"+Lookahead+"' found.");
+                    throw new RegexParserException(index, "'"+c+"' expected, but '"+Lookahead+"' found.");
                 index++;
             }
 
@@ -330,7 +330,7 @@ namespace Lexer
                 {
                     var last = Char();
                     if (last.Length != 1)
-                        throw new InvalidOperationException("Invalid upper bound for character range!");
+                        throw new RegexParserException(index, "Invalid upper bound for character range!");
                     result = new CharSet(new CharRange(first.First().First(), last.First().First()));
                 }
                 else
@@ -348,7 +348,7 @@ namespace Lexer
                     switch(asciiTable[Lookahead])
                     {
                         case CharType.Invalid:
-                            throw new InvalidOperationException("Invalid character!");
+                            throw new RegexParserException(index, "Invalid character: "+Lookahead+"!");
                         case CharType.Literal:
                             var first = Lookahead;
                             index++;
@@ -382,11 +382,11 @@ namespace Lexer
                                         }
                                     }
                                     if (!found)
-                                        throw new InvalidOperationException("Invalid escape character: " + Lookahead);
+                                        throw new RegexParserException(index, "Invalid escape character: " + Lookahead);
                                 }
                             }
                             else
-                                throw new InvalidOperationException("Invalid character!");
+                                throw new RegexParserException(index, "Invalid character: "+Lookahead+"!");
                             break;
                     }
                 }

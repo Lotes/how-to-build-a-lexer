@@ -39,9 +39,9 @@ namespace Lexer.Automaton.Impl
         public IAutomaton Build()
         {
             if(StateCounter == 0)
-                throw new InvalidOperationException("No states defined!");
+                throw new AutomatonConstructionException("No states defined!");
             if(startState == -1)
-                throw new InvalidOperationException("No start defined!");
+                throw new AutomatonConstructionException("No start defined!");
             return new Automaton(StateCounter, startState, acceptingStates, 
                 transitions.ToDictionary(kv => kv.Key, kv => (ITransitionTargets)kv.Value));
         }

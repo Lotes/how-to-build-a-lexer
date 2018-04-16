@@ -21,11 +21,12 @@ namespace Main
                     var automaton = parser.Parse(input);
                     automaton.Print();
                 }
-                catch (Exception e)
+                catch (RegexParserException e)
                 {
+                    Console.WriteLine("  "+(" ".Times(e.Index))+"^");
                     Console.Error.WriteLine(e.Message);
-                    Console.Error.WriteLine(e.StackTrace);
                 }
+                Console.WriteLine();
             } while (true);
         }
     }
